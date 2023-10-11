@@ -17,7 +17,6 @@
         "yiisoft/yii2": "~2.0.0",
         "zircote/swagger-php": "^4.7",
         "klisl/yii2-languages": "^2.8",
-        "yiisoft/i18n": "^1.1",
         "hail812/yii2-adminlte3": "~1.1"
     },
     "extra": {
@@ -25,8 +24,7 @@
     },
     "autoload": {
         "psr-4": {
-            "openecontmd\\backend_api\\": "",
-            "klisl\\languages\\": ""
+            "openecontmd\\backend_api\\": ""
         }
     }
 }
