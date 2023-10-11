@@ -16,7 +16,6 @@
     "require": {
         "yiisoft/yii2": "~2.0.0",
         "zircote/swagger-php": "^4.7",
-        "klisl/yii2-languages": "^2.8",
         "hail812/yii2-adminlte3": "~1.1"
     },
     "extra": {
