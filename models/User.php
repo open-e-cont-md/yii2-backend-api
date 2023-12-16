@@ -1,5 +1,6 @@
 <?php
-namespace cabinet\models;
+//namespace cabinet\models;
+namespace openecontmd\backend_api\models;
 
 //use common\models\Role;
 //use common\models\SysActionRoles;
@@ -8,6 +9,7 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use openecontmd\backend_api\models\Terms;
 
 /**
  * This is the model class for table "ut_user".

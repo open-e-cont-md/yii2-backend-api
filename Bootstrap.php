@@ -18,7 +18,8 @@ class Bootstrap implements BootstrapInterface
         $app->getRequest()->setBaseUrl('');
         $app->set('request', [
             'class' => 'klisl\languages\Request',
-            'csrfParam' => '_csrf-backend',
+            //'csrfParam' => '_csrf-backend',
+            'csrfParam' => '_csrf',
             'cookieValidationKey' => '56xL4rFl91AMzQ97zmLXL5z60GzDc3BV'
         ]);
 /*
@@ -147,6 +148,33 @@ class Bootstrap implements BootstrapInterface
 //                '<module:[\w-]+>/<language:[\w+]+>/<submodule:[\w-]+>/<controller:[\w-]+>/<action:[\w-]+>' => '/v2/<submodule>/<controller>/<action>',
                 '' => 'manager/dashboard',
                 'dashboard' => 'manager/dashboard',
+                'table' => 'manager/table',
+                'ajaxtable' => 'manager/ajaxtable',
+
+                'client' => 'client/list',
+                'client/edit/<key:\w+>' => 'client/edit',
+                'outgoing' => 'invoice/list',
+                'outgoing/view/<key:\w+>' => 'invoice/view',
+                'outgoing/new' => 'invoice/edit',
+                'outgoing/edit/<key:\w+>' => 'invoice/edit',
+                'outgoing/send/<key:\w+>' => 'invoice/send',
+
+                'vendor' => 'client/vendor',
+                'incoming' => 'incoming/list',
+                'incoming/view/<key:\w+>' => 'incoming/view',
+
+                'customer' => 'manager/customer',
+                'customer/auto/<client_id:[\d]+>' => 'customer/buyersearch',
+                'customer/ajax/<client_id:[\d]+>' => 'customer/buyerajax',
+
+                'message' => 'manager/message',
+                'repository' => 'manager/repository',
+
+                'manager' => 'manager/list',
+                'manager/edit/<email:[\w\@\.\-]+>/<key:\w+>' => 'manager/edit',
+                'setting' => 'manager/setting',
+                'rights' => 'manager/rights',
+                'icons' => 'manager/icons',
 
                 '<controller:\w+>' => '<controller>/index',
                 '<controller:\w+>/<id:\d+>'=>'<controller>/view',

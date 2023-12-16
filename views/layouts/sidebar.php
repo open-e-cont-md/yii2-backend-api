@@ -1,8 +1,13 @@
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<?
+    $ln = Yii::$app->language;
+//    $rt = explode('/', Yii::$app->controller->request->url);
+    $rt = Yii::$app->controller->request->url;
+
+?><aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
+    <a href="/dashboard" class="brand-link">
         <img src="<?=$assetDir?>/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">Manager's Cabinet</span>
+        <span class="brand-text font-weight-light">Admin's Cabinet</span>
     </a>
 
     <!-- Sidebar -->
@@ -32,25 +37,30 @@
                 </div>
             </div>
         </div> -->
-
+<?// var_dump($rt); ?>
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <?php
             echo \hail812\adminlte\widgets\Menu::widget([
                 'items' => [
-                    ['label' => 'DASHBOARD', 'url' => ['/dashboard'], 'icon' => 'th'],
-                    ['label' => 'ACCOUNT', 'url' => ['/customer'], 'icon' => 'user'],
-                    ['label' => 'REPOSITORY', 'url' => ['/repository'], 'icon' => 'file-code'],
-                    ['label' => 'MESSAGES', 'url' => ['/message'], 'icon' => 'envelope'],
+                    ['label' => 'DASHBOARD', 'url' => ['/'.$ln.'/dashboard'], 'icon' => 'th', 'active' => ($rt == '/'.$ln.'/dashboard')],
+                    ['label' => 'MESSAGES', 'url' => ['/'.$ln.'/message'], 'icon' => 'envelope', 'badge' => '<span class="right badge badge-danger">3</span>', 'active' => ($rt == '/'.$ln.'/message')],
+
+                    ['label' => 'ACCOUNT', 'url' => ['/'.$ln.'/customer'], 'icon' => 'user', 'active' => ($rt == '/'.$ln.'/customer')],
+                    ['label' => 'MANAGERS', 'url' => ['/'.$ln.'/manager'], 'icon' => 'users', 'active' => ($rt == '/'.$ln.'/manager')],
 
                     ['label' => 'OUTGOING:', 'header' => true],
-                    ['label' => 'CLIENTS', 'url' => ['/client'], 'icon' => 'shopping-cart'],
-                    ['label' => 'INVOICES', 'url' => ['/outgoing'], 'icon' => 'file-export'],
+                    ['label' => 'CLIENTS', 'url' => ['/'.$ln.'/client'], 'icon' => 'shopping-cart', 'active' => ($rt == '/'.$ln.'/client')],
+                    ['label' => 'INVOICES', 'url' => ['/'.$ln.'/outgoing'], 'icon' => 'file-export', 'active' => ($rt == '/'.$ln.'/outgoing')],
 
                     ['label' => 'INCOMING:', 'header' => true],
-                    ['label' => 'VENDORS', 'url' => ['/vendor'], 'icon' => 'shopping-cart'],
-                    ['label' => 'INCOMING', 'url' => ['/incoming'], 'icon' => 'file-import'],
+                    ['label' => 'VENDORS', 'url' => ['/'.$ln.'/vendor'], 'icon' => 'shopping-cart', 'active' => ($rt == '/'.$ln.'/vendor')],
+                    ['label' => 'INCOMING', 'url' => ['/'.$ln.'/incoming'], 'icon' => 'file-import', 'badge' => '<span class="right badge badge-success">11</span>', 'active' => ($rt == '/'.$ln.'/incoming')],
 
+                    ['label' => 'SETTINGS:', 'header' => true],
+                    ['label' => 'REPOSITORY', 'url' => ['/'.$ln.'/repository'], 'icon' => 'file-code', 'active' => ($rt == '/'.$ln.'/repository')],
+                    ['label' => 'USER RIGHTS', 'url' => ['/'.$ln.'/rights'], 'icon' => 'key', 'active' => ($rt == '/'.$ln.'/rights')],
+                    ['label' => 'PARAMETERS', 'url' => ['/'.$ln.'/setting'], 'icon' => 'sliders-h', 'active' => ($rt == '/'.$ln.'/setting')],
 /**
                      ['label' => ' ', 'header' => true],
                      ['label' => '---=== SAMPLE ===---', 'header' => true],

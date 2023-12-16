@@ -8,7 +8,7 @@ use yii\bootstrap4\Breadcrumbs;
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <h1 class="m-0">
                         <?php
                         if (!is_null($this->title)) {
@@ -19,6 +19,7 @@ use yii\bootstrap4\Breadcrumbs;
                         ?>
                     </h1>
                 </div><!-- /.col -->
+<?/**?>
                 <div class="col-sm-6">
                     <?php
                     echo Breadcrumbs::widget([
@@ -29,6 +30,7 @@ use yii\bootstrap4\Breadcrumbs;
                     ]);
                     ?>
                 </div><!-- /.col -->
+<?/**/?>
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
     </div>

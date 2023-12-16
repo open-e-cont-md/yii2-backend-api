@@ -6,12 +6,13 @@ use yii\helpers\Html;
 <!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
 
-<?/**?>
+<?/**/?>
     <!-- Left navbar links -->
     <ul class="navbar-nav">
         <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
+<?/**?>
         <li class="nav-item d-none d-sm-inline-block">
             <a href="<?=\yii\helpers\Url::home()?>" class="nav-link">Home</a>
         </li>
@@ -55,8 +56,10 @@ use yii\helpers\Html;
                 <!-- End Level two -->
             </ul>
         </li>
+<?/**/?>
     </ul>
 
+<?/**?>
     <!-- SEARCH FORM -->
     <form class="form-inline ml-3">
         <div class="input-group input-group-sm">
@@ -97,6 +100,15 @@ use yii\helpers\Html;
         </li>
 <?/**/?>
 
+<li class="nav-item dropdown">
+        <div class="nav navbar-nav navbar-right" style="width:auto;padding: 6px 40px 0 0">
+			<div>
+				<a href="/ro/<?= Yii::$app->request->pathInfo ?>"><img alt="RO" src="" style="width:16px; border-bottom: solid 3px <?= (Yii::$app->language == 'ro') ? '#26b99a' : '#ededed' ?>"></a> &nbsp;
+				<a href="/ru/<?= Yii::$app->request->pathInfo ?>"><img alt="RU" src="" style="width:16px; border-bottom: solid 3px <?= (Yii::$app->language == 'ru') ? '#26b99a' : '#ededed' ?>"></a> &nbsp;
+				<a href="/en/<?= Yii::$app->request->pathInfo ?>"><img alt="EN" src="" style="width:16px; border-bottom: solid 3px <?= (Yii::$app->language == 'en') ? '#26b99a' : '#ededed' ?>"></a>
+			</div>
+		</div>
+</li>
         <!-- Messages Dropdown Menu -->
         <li class="nav-item dropdown">
 <?/**?>
@@ -156,6 +168,7 @@ use yii\helpers\Html;
                 <div class="dropdown-divider"></div>
                 <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
             </div>
+<?/**/?>
         </li>
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown">
@@ -194,7 +207,7 @@ use yii\helpers\Html;
             <?= Html::a('<i class="fas fa-sign-out-alt"></i>', ['/site/logout'], ['data-method' => 'post', 'class' => 'nav-link']) ?>
         </li>
 
-<?/**?>
+<?/**/?>
         <li class="nav-item">
             <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
                 <i class="fas fa-th-large"></i>

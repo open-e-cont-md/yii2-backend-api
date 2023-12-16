@@ -29,7 +29,7 @@ class SiteController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => ['logout', 'index', 'table', 'ajaxtable'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -65,6 +65,28 @@ class SiteController extends Controller
     {
         return $this->render('index');
     }
+
+
+    /**     http://my.admin-test.repo.tst/site/table
+     * Displays table.
+     *
+     * @return string
+     */
+    public function actionTable()
+    {
+        return $this->render('table');
+    }
+
+    /**     http://my.admin-test.repo.tst/site/ajaxtable
+     * Displays table.
+     *
+     * @return string
+     */
+    public function actionAjaxtable()
+    {
+        return $this->render('ajaxtable');
+    }
+
 
     /**
      * Login action.
