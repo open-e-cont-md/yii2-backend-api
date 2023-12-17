@@ -2,7 +2,6 @@
 use yii\helpers\Html;
 use openecontmd\backend_api\models\Terms;
 use openecontmd\backend_api\models\Invoice;
-use openecontmd\backend_api\widgets\AlertToastr;
 
 $this->title = str_replace(['<br>', '<br/>'], ' ', 'Редактирование счёта на оплату'); // Yii::t('apl','sign_in');
 $params['class'] = 'form-control';
@@ -12,7 +11,8 @@ $params['autocomplete'] = 'off';
 //$bundlea = \hail812\adminlte3\assets\AdminLteAsset::register($this);
 $bundle = \hail812\adminlte3\assets\PluginAsset::register($this);
 $jsbundle = \openecontmd\backend_api\assets\BackendAsset::register($this);
-$tsbundle = \hail812\adminlte3\assets\PluginAsset::register($this)->add(['sweetalert2', 'toastr']);
+//$tsbundle = \hail812\adminlte3\assets\PluginAsset::register($this)->add(['sweetalert2', 'toastr']);
+
 
 //echo "<pre>"; var_dump($jsbundle); echo "</pre>"; exit;
 
@@ -47,7 +47,7 @@ $bundle->js[] = 'moment/moment.min.js';
 $bundle->js[] = 'daterangepicker/daterangepicker.js';
 
 $jsbundle->js[] = 'js/jquery.cookie.min.js';
-$tsbundle->js[] = 'toastr/toastr.min.js';
+//$tsbundle->js[] = 'toastr/toastr.min.js';
 
 
 $country_list = Yii::$app->db->createCommand("SELECT ANSI2 AS value, json_get(CountryCaption, '".Yii::$app->language."') AS caption FROM ut_country ORDER BY json_get(CountryCaption, '".Yii::$app->language."')")->queryAll();
@@ -447,7 +447,6 @@ label {
     width: 100%;
 /*    letter-spacing: 1px;*/
 }
-
 -->
 </style>
 
@@ -1050,7 +1049,7 @@ var ii = <?= $i-1 ?>;
 </div>
 </div>
 
-<?= AlertToastr::widget() ?>
+
 
 <?/**?>
 <br clear="all">

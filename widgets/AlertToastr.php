@@ -3,7 +3,8 @@
 namespace openecontmd\backend_api\widgets;
 
 use Yii;
-use lavrentiev\widgets\toastr\Notification;
+//use lavrentiev\widgets\toastr\Notification;
+use openecontmd\backend_api\notification\Notification;
 use openecontmd\backend_api\models\Terms;
 
 /**
@@ -53,6 +54,7 @@ class AlertToastr extends \yii\bootstrap4\Widget
      */
     public function run()
     {
+
         $session = Yii::$app->session;
         $flashes = $session->getAllFlashes();
         $appendClass = isset($this->options['class']) ? ' ' . $this->options['class'] : '';
@@ -61,8 +63,10 @@ class AlertToastr extends \yii\bootstrap4\Widget
             if (!isset($this->alertTypes[$type])) {
                 continue;
             }
-
             foreach ((array) $flash as $i => $message) {
+
+                //var_dump($type, $i, $message); exit;
+
                 Notification::widget([
 //                    'type' => $this->alertTypes[$type], //Notification::TYPE_ERROR,
                     'type' => $type,

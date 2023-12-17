@@ -4,6 +4,7 @@
 /* @var $content string */
 
 use yii\helpers\Html;
+use openecontmd\backend_api\widgets\AlertToastr;
 
 \hail812\adminlte3\assets\FontAwesomeAsset::register($this);
 \hail812\adminlte3\assets\AdminLteAsset::register($this);
@@ -30,6 +31,24 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
 <body class="hold-transition sidebar-mini">
 <?php $this->beginBody() ?>
 
+
+<style>
+<!--
+.toast-title {
+    font-size: 1.4rem;
+}
+.toast-message {
+    font-size: 1.4rem;
+}
+#toast-container.toast-top-full-width > div,
+#toast-container.toast-bottom-full-width > div {
+  width: 40%;
+}
+
+-->
+</style>
+
+
 <div class="wrapper">
     <!-- Navbar -->
     <?= $this->render('navbar', ['assetDir' => $assetDir]) ?>
@@ -49,6 +68,8 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <!-- Main Footer -->
     <?= $this->render('footer') ?>
 </div>
+
+<?= AlertToastr::widget() ?>
 
 <?php $this->endBody() ?>
 </body>

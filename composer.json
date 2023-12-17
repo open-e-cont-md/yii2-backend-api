@@ -16,8 +16,7 @@
     "require": {
         "yiisoft/yii2": "~2.0.0",
         "zircote/swagger-php": "^4.7",
-        "hail812/yii2-adminlte3": "~1.1",
-        "lavrentiev/yii2-toastr": "^2.0"
+        "hail812/yii2-adminlte3": "~1.1"
     },
     "extra": {
         "bootstrap": "openecontmd\\backend_api\\Bootstrap"
