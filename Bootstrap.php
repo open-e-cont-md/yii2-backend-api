@@ -1,4 +1,15 @@
 <?php
+/*
+
+"klisl/yii2-languages": "^2.8",  ???
+
+"datatables.net/datatables.net": "dev-master",
+"datatables.net/datatables.net-responsive": "dev-master",
+"datatables.net/datatables.net-buttons": "dev-master",
+"datatables.net/datatables.net-select": "dev-master",
+
+*/
+
 
 namespace openecontmd\backend_api;
 
@@ -17,23 +28,12 @@ class Bootstrap implements BootstrapInterface
 
         $app->getRequest()->setBaseUrl('');
         $app->set('request', [
-            'class' => 'klisl\languages\Request',
+//            'class' => 'klisl\languages\Request',
             //'csrfParam' => '_csrf-backend',
             'csrfParam' => '_csrf',
             'cookieValidationKey' => '56xL4rFl91AMzQ97zmLXL5z60GzDc3BV'
         ]);
-/*
-        $app->set('i18n', [
-            'translations' => [
-                '*' => [
-                    'class' => 'yii\i18n\DbMessageSource',
-                    'sourceMessageTable' => 'sys_source_message',
-                    'messageTable' => 'sys_message',
-                    'forceTranslation' => true,
-                ],
-            ],
-        ]);
-*/
+
         $app->getUrlManager()->enablePrettyUrl = true;
         $app->getUrlManager()->showScriptName = false;
         $app->language = 'en';
@@ -43,14 +43,14 @@ class Bootstrap implements BootstrapInterface
          * Регистрация модулей
          * (вместо указания в файле config/main.php
          */
-
+/*
         $app->setModule('languages', [
             'class' => 'klisl\languages\Module',
             'languages' => ['Eng' => 'en','Rom' => 'ro','Рус' => 'ru'],
             'default_language' => 'en',
             'show_default' => false
         ]);
-
+*/
         //$app->getModule('languages')->bootstrap($app);
         //echo "<pre>"; var_dump($app->getModule('languages')); exit;
 
