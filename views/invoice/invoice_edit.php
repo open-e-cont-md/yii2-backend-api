@@ -1,7 +1,7 @@
 <?php
 use yii\helpers\Html;
 use openecontmd\backend_api\models\Terms;
-use openecontmd\backend_api\models\Invoice;
+use openecontmd\backend_api\models\ApiInvoice;
 
 $this->title = str_replace(['<br>', '<br/>'], ' ', 'Редактирование счёта на оплату'); // Yii::t('apl','sign_in');
 $params['class'] = 'form-control';
@@ -69,7 +69,7 @@ ksort($country_list);
 $currency_list = ['' => 'MDL', 'MDL' => 'MDL', 'EUR' => 'EUR', 'USD' => 'USD'];
 $sb = isset($context['selected_business']) ? $context['selected_business'] : null;
 $b = (isset($sb) && isset($context['business'][$sb])) ? $context['business'][$sb] : null;
-$customer_list = Invoice::getCustomers($context['client']->alias);
+$customer_list = ApiInvoice::getCustomers($context['client']->alias);
 //echo "<pre>"; var_dump($customer_list); echo "</pre>"; exit;
 if (isset($customer[$invoice[0]->buyer_id])) {
     $bid = isset($invoice[0]->buyer_id) ? $invoice[0]->buyer_id : 0;

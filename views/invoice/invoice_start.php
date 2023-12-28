@@ -1,7 +1,7 @@
 <?php
 //use yii\helpers\Html;
 use openecontmd\backend_api\models\Helper;
-use openecontmd\backend_api\models\Invoice;
+use openecontmd\backend_api\models\ApiInvoice;
 use openecontmd\backend_api\models\Terms;
 
 $this->title = str_replace(['<br>', '<br/>'], ' ', 'Добавление счёта на оплату'); // Yii::t('apl','sign_in');
@@ -49,7 +49,7 @@ $status_list = [
 $currency_list = ['' => 'MDL', 'MDL' => 'MDL', 'EUR' => 'EUR', 'USD' => 'USD'];
 $sb = isset($context['selected_business']) ? $context['selected_business'] : null;
 $b = (isset($sb) && isset($context['business'][$sb])) ? $context['business'][$sb] : null;
-$customer_list = Invoice::getCustomers($context['client']->alias);
+$customer_list = ApiInvoice::getCustomers($context['client']->alias);
 
 $ipattern_list = Yii::$app->db->createCommand("
 SELECT

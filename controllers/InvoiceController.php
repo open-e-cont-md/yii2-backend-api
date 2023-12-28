@@ -12,14 +12,34 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Response;
 use openecontmd\backend_api\models\User;
-use openecontmd\backend_api\models\Invoice;
+use openecontmd\backend_api\models\ApiInvoice;
 use openecontmd\backend_api\models\Terms;
+
+use DateTime;
+use Einvoicing\Invoice;
+use Einvoicing\Presets;
+use Einvoicing\Presets\Peppol;
+use Einvoicing\Presets\CiusAtGov;
+use Einvoicing\Presets\CiusRo;
+use Einvoicing\Identifier;
+use Einvoicing\Party;
+use Einvoicing\InvoiceLine;
+use Einvoicing\Writers\UblWriter;
+
+use openecontmd\backend_api\models\SendMailSmtpClass;
 
 /**
  * Site controller
  */
 class InvoiceController extends BaseController
 {
+/*
+    const CURRENCY_ISO4217_MDL = '498';
+    const CURRENCY_ISO4217_EUR = '978';
+    const CURRENCY_ISO4217_USD = '840';
+    const CURRENCY_ISO4217_RUB = '643';
+*/
+
     /**
      * @inheritdoc
      */
@@ -164,7 +184,7 @@ class InvoiceController extends BaseController
         $items = @json_decode($invoice['json_data'])->Document->SupplierInfo->Merchandises;
 
 //        $status = json_decode(Invoice::getStatusCaption($invoice['status'])->{Yii::$app->language});
-        $status = Invoice::getStatusCaption($invoice['status'])['caption'];
+        $status = ApiInvoice::getStatusCaption($invoice['status'])['caption'];
         $status = json_decode($status)->{Yii::$app->language};
 //        echo "<pre>"; var_dump(json_decode($status)->{Yii::$app->language}); echo "</pre>"; exit;
 //var_dump($invoice['json_data'], $items);exit;
@@ -202,8 +222,8 @@ class InvoiceController extends BaseController
         $factura = @json_decode($invoice['json_data'])->Document;
         $items = @json_decode($invoice['json_data'])->Document->SupplierInfo->Merchandises;
 
-        //        $status = json_decode(Invoice::getStatusCaption($invoice['status'])->{Yii::$app->language});
-        $status = Invoice::getStatusCaption($invoice['status'])['caption'];
+        //        $status = json_decode(ApiInvoice::getStatusCaption($invoice['status'])->{Yii::$app->language});
+        $status = ApiInvoice::getStatusCaption($invoice['status'])['caption'];
         $status = json_decode($status)->{Yii::$app->language};
         //        echo "<pre>"; var_dump(json_decode($status)->{Yii::$app->language}); echo "</pre>"; exit;
         //var_dump($invoice['json_data'], $items);exit;
@@ -471,23 +491,23 @@ paid_date = '".(isset($p['paid_date']) ? ((strtotime($p['paid_date']) > 0) ? dat
 
         if ($key != '') {
 
-            $invoice = Invoice::findInvoiceNumber($b['client_id'], $b['business_token'], $b['prefix']);
+            $invoice = ApiInvoice::findInvoiceNumber($b['client_id'], $b['business_token'], $b['prefix']);
 //echo "<plaintext>"; var_dump($invoice, $b); echo "</pre>"; exit;
             $seq_num = $invoice['seq_num'];
-            $invoice = Invoice::findInvoice($key);
+            $invoice = ApiInvoice::findInvoice($key);
 
 //echo "<plaintext>"; var_dump($invoice, $b); echo "</pre>"; exit;
 
             $invoice[0]->seq_num = $seq_num;
-            $customer = Invoice::getCustomerById($context['client']->client_id, $invoice[0]->buyer_id);
+            $customer = ApiInvoice::getCustomerById($context['client']->client_id, $invoice[0]->buyer_id);
 //echo "<pre>"; var_dump($business, $invoice); echo "</pre>"; exit;
             $items = @json_decode($invoice[0]->json_data)->Document->SupplierInfo->Merchandises;
 //            echo "<pre>"; var_dump($invoice[0]->json_data, json_decode($invoice[0]->json_data)); echo "</pre>"; exit;
             if (isset($items->Row)) $items = $items->Row;
             if ($flag_copy) $invoice[0]->status = 'draft';
-            $statuses = Invoice::getStatuses($invoice[0]->status);
+            $statuses = ApiInvoice::getStatuses($invoice[0]->status);
             //$status = json_decode(Invoice::getStatusCaption($invoice[0]->status))->{Yii::$app->language};
-            $status = Invoice::getStatusCaption($invoice[0]->status);
+            $status = ApiInvoice::getStatusCaption($invoice[0]->status);
             $status = json_decode($status['caption'])->{Yii::$app->language};
 //echo "<pre>"; var_dump($status); echo "</pre>"; exit;
             if ( ($mode == 'stay') || ($mode == 'stay_create') )
@@ -522,12 +542,12 @@ paid_date = '".(isset($p['paid_date']) ? ((strtotime($p['paid_date']) > 0) ? dat
         }
         else
         {
-            $invoice = Invoice::findInvoiceNumber($b['client_id'], $b['business_token'], $b['prefix']);
+            $invoice = ApiInvoice::findInvoiceNumber($b['client_id'], $b['business_token'], $b['prefix']);
             //if ( (!$invoice['seq_num']) $invoice['seq_num'] = $b['prefix'].$invoice['seq_num'];
-            $statuses = Invoice::getStatuses('draft');
+            $statuses = ApiInvoice::getStatuses('draft');
 //            $statuses = Invoice::getStatuses($invoice[0]->status);
 //echo "<pre>"; var_dump($b); echo "</pre>"; exit;
-            $business_prefix = Invoice::getBusinessPrefix($context['client']->clientID, $b['businessID'], 'invoices_manual');
+            $business_prefix = ApiInvoice::getBusinessPrefix($context['client']->clientID, $b['businessID'], 'invoices_manual');
 //echo "<pre>"; var_dump($context['client']->clientID, $b['businessID'], $business_prefix); echo "</pre>"; exit;
 //            var_dump($business_prefix); exit;
 
@@ -982,11 +1002,650 @@ paid_date = '".(isset($p['paid_date']) ? ((strtotime($p['paid_date']) > 0) ? dat
         if (isset($key) && $key != '') {
             $ret = ['result' => 'Server error!'];
         }
+        $context = [];
+        $_user = User::findByEmail(\Yii::$app->user->identity->email);
+        $context['user'] = $_user;
+        $context['business_aliases'] = explode(',', $_user['business_alias_list']);
+        $invoice = Yii::$app->db->createCommand("SELECT * FROM ut_factura WHERE (inner_hash = '".addslashes($key)."')")->queryOne();
+//var_dump($invoice['json_data']);exit;
+        $factura = @json_decode($invoice['json_data'])->Document;
+        $items = @json_decode($invoice['json_data'])->Document->SupplierInfo->Merchandises;
+//var_dump($items);exit;
+        //        $status = json_decode(Invoice::getStatusCaption($invoice['status'])->{Yii::$app->language});
+        $status = ApiInvoice::getStatusCaption($invoice['status'])['caption'];
+        $status = json_decode($status)->{Yii::$app->language};
+        $cius = 'peppol';
+//var_dump($invoice, $factura, $items);exit;
 
+        //  Invoice Instance
+        switch ($cius) {
+            default:
+            case 'peppol':
+                $inv = new Invoice(Presets\Peppol::class);
+                $cius_str = Peppol::getSpecification();
+                break;
+            case 'austria':
+                $inv = new Invoice(Presets\CiusAtGov::class);
+                $cius_str = CiusAtGov::getSpecification();
+                break;
+            case 'romania':
+                $inv = new Invoice(Presets\CiusRo::class);
+                $cius_str = CiusRo::getSpecification();
+                break;
+        }
+        $inv->setCurrency('MDL');
+        $inv->setVatCurrency('MDL');
+
+        $inv->setNumber($invoice["outer_number"])
+        ->setIssueDate(new DateTime(substr($invoice["issue_date"], 0, 10)))
+        ->setDueDate(new DateTime(substr($invoice["due_on"], 0, 10)));
+
+        //  Seller Instance
+        $seller_identifier = new Identifier($factura->SupplierInfo->Supplier->IDNO, '0000'); // $factura->SupplierInfo->Supplier->IDNO
+        $seller = new Party();
+        $seller->setContactName($factura->SupplierInfo->Supplier->Name);
+        $seller->setContactEmail($factura->SupplierInfo->Supplier->Email);
+        $seller->setElectronicAddress( $seller_identifier )
+        ->setCompanyId(new Identifier($factura->SupplierInfo->Supplier->IDNO, '0000'))
+        ->setName($factura->SupplierInfo->Supplier->Title)
+        ->setTradingName($factura->SupplierInfo->Supplier->Title)
+        ->setVatNumber($factura->SupplierInfo->Supplier->TVA)
+        ->setAddress([$factura->SupplierInfo->Supplier->Address])
+        ->setCity('Chisinau')
+        ->setCountry('MD');
+        $inv->setSeller($seller);
+
+        //  Buyer Instance
+        $buyer_identifier = new Identifier($factura->SupplierInfo->Buyer->IDNO, '0000');
+        $buyer = new Party();
+        $buyer->setElectronicAddress( $buyer_identifier )
+        ->setName($factura->SupplierInfo->Buyer->Name)
+        ->setCountry('MD');
+        $inv->setBuyer($buyer);
+
+        foreach ($items as $k => $v) {
+            $line = new InvoiceLine();
+            $line->setName($v->Name)
+            ->setPrice($v->UnitPrice)
+            ->setVatRate($v->TVA)
+            ->setUnit('PCS')
+            ->setQuantity($v->Quantity);
+            $inv->addLine($line);
+        }
+/*
+        // 4 items priced at €40/unit + 16% VAT
+        $firstLine = new InvoiceLine();
+        $firstLine->setName('Product Name')
+        ->setPrice(40)
+        ->setVatRate(16)
+        ->setQuantity(4);
+        $inv->addLine($firstLine);
+
+        // 27 items price at €10 per 5 units + 4% VAT
+        $secondLine = new InvoiceLine();
+        $secondLine->setName('Line #2')
+        ->setDescription('The description for the second line')
+        ->setPrice(10, 5)
+        ->setQuantity(27)
+        ->setVatRate(4);
+        $inv->addLine($secondLine);
+*/
+        // Close and output XML document
+        $ubl_writer = new UblWriter();
+        $ubl_document = $ubl_writer->export($inv);
+
+        $time = "(".date("d.m.Y_H.i", time()).")";
+        $cdn_path = __DIR__.'/../../../../backend/web/documents/';
+        $fname = $invoice["outer_number"].'_'.$time.'.xml';
+
+        file_put_contents($cdn_path.$fname, $ubl_document);
+        chmod($cdn_path.$fname, 0664);
+
+//        var_dump($fname);exit;
+
+
+//var_dump($inv);exit;
+
+
+        //$ri = reset($ri);
+        //echo "*****<plaintext>"; //var_dump($ri[0]); exit;
+
+        $subject = 'OPEN.E-CONT.MD: Invoice '.$invoice["outer_number"].' (XML format)';
+        $body  = 'XML Invoice: '.$invoice["outer_number"]."<br/>\n";
+        $body .= 'Profile: PEPPOL'."<br/><br/>\n";
+        $body .= 'See attached XML file: <b>'.$fname."</b>\n";
+        $mail_to = 'oleg.dynga@gmail.com';
+
+        $mail_smtp = 'ssl://mail.invoicing.md'; // $ri['key_1'];
+        $mail_port = '465'; // $ri['token_code'];
+        $mail_username = 'noreply@invoicing.md'; // $ri['key_2'];
+        $mail_password = 'hB+D@!G-b}fX'; // $ri['key_3'];
+        $mail_from = 'noreply@invoicing.md'; // $ri['token_refresh'];
+        $mail_name = 'OPEN.E-CONT.MD'; // $ri['token_access'];
+        $mailSMTP = new SendMailSmtpClass($mail_username, $mail_password, $mail_smtp, $mail_port, "utf-8");
+        $mailSMTP->addFile($cdn_path.$fname);
+        //          return $mailSMTP;
+
+        $result =  $mailSMTP->send($mail_to, $subject, $body, [$mail_name, $mail_from]);
+
+
+
+        return $result;
         Yii::$app->response->format = Response::FORMAT_JSON;
         Yii::$app->response->getHeaders()->set('Content-Type', 'text/json; charset=utf-8');
-        return $ret;
+        return $ubl_document;
     }
 
 
 }
+
+
+/*
+
+=== $invoice ===
+
+array(41) {
+  ["facturaID"]=>
+  string(3) "650"
+  ["ParentID"]=>
+  string(32) "65660f2fe278058f229cc52d8f18b53e"
+  ["client_alias"]=>
+  string(7) "diginet"
+  ["business_alias"]=>
+  string(32) "2ea9685ae0420f057f98b0dbc2d55ad0"
+  ["moment"]=>
+  string(19) "2022-11-22 19:04:43"
+  ["due_on"]=>
+  string(19) "2022-11-23 00:00:00"
+  ["issue_date"]=>
+  string(19) "2022-11-22 17:04:42"
+  ["delivery_date"]=>
+  string(19) "2022-11-23 00:00:00"
+  ["paid_date"]=>
+  NULL
+  ["outer_number"]=>
+  string(10) "Delta-4366"
+  ["inner_hash"]=>
+  string(32) "50cd548b30ae3454fd63fb934d079dec"
+  ["supplier_idno"]=>
+  string(13) "1019600052449"
+  ["buyer_idno"]=>
+  string(14) "12345678901234"
+  ["buyer_name"]=>
+  string(14) "Alter Ego I.I."
+  ["buyer_id"]=>
+  string(1) "0"
+  ["remark"]=>
+  string(0) ""
+  ["amount"]=>
+  string(5) "82.00"
+  ["currency"]=>
+  string(3) "MDL"
+  ["status"]=>
+  string(5) "draft"
+  ["xml_source"]=>
+  string(1786) "<?xml version="1.0" encoding="utf8"?>
+<Documents>
+ <Document>
+  <SupplierInfo>
+   <DeliveryDate>2022-11-22 17:04:42</DeliveryDate>
+   <Supplier IDNO="1019600052449" Title="Delta S.A." Address="Chisinau, str. Columna, 84" TaxpayerType="1">
+    <BankAccount BranchTitle="Victoriabank, Chisinau, Centru" BranchCode="VB654543" Account="MD54654654400003458776"/>
+   </Supplier>
+   <Buyer IDNO="12345678901234" Title="Alter Ego I.I." Address="" TaxpayerType="1">
+    <BankAccount BranchTitle="-" BranchCode="-" Account="-"/>
+   </Buyer>
+   <Transporter IDNO="-" Title="-" Address="-" TaxpayerType="1">
+    <BankAccount BranchTitle="-" BranchCode="-" Account="-"/>
+   </Transporter>
+   <AttachedDocuments/>
+   <Notes/>
+   <DelegateSeria/>
+   <DelegateNumber/>
+   <DelegateName/>
+   <DelegateDate/>
+   <VehicleLogbook>
+    <IssueDate/>
+    <Seria/>
+    <Number/>
+   </VehicleLogbook>
+   <LoadingPoint/>
+   <UnloadingPoint/>
+   <Redirections/>
+   <Merchandises>
+    <Row Code="1" Name="Set de 5 panze de ferastrau, Alluse, T144D" UnitPrice="30.00" Quantity="2" UnitOfMeasure="pcs" TotalPrice="60.00" UnitPriceWithoutTVA="0" TotalPriceWithoutTVA="0" TVA="0" TotalTVA="0" OtherInfo="" PackageType="" NumberOfPlaces="0" GrossWeight="0"/>
+    <Row Code="2" Name="Fierastrau pentru metal cu maner plastic, TSK26" UnitPrice="22.00" Quantity="1" UnitOfMeasure="pcs" TotalPrice="22.00" UnitPriceWithoutTVA="0" TotalPriceWithoutTVA="0" TVA="0" TotalTVA="0" OtherInfo="" PackageType="" NumberOfPlaces="0" GrossWeight="0"/>
+   </Merchandises>
+   <CreationMotiv>1</CreationMotiv>
+  </SupplierInfo>
+  <AdditionalInformation>
+   <field>Remark...</field>
+   <remark>Remark...</remark>
+   <total>82.00</total>
+   <issue_date>2022-11-22 17:04:42</issue_date>
+  </AdditionalInformation>
+ </Document>
+</Documents>
+"
+  ["json_data"]=>
+  string(3661) "{
+    "Document": {
+        "SupplierInfo": {
+            "DeliveryDate": "2022-11-22 17:04:42",
+            "Supplier": {
+                "IDNO": "1019600052449",
+                "TVA": "0208851",
+                "Title": "Delta S.A.",
+                "Name": "Vladimir Macarov",
+                "Email": "delta.sa@gmail.com",
+                "Phone": "‎+373 79 760-762",
+                "Address": "Chisinau, str. Columna, 84",
+                "TaxpayerType": 1,
+                "BankAccount": {
+                    "BranchTitle": "Victoriabank, Chisinau, Centru",
+                    "BranchCode": "VB654543",
+                    "Account": "MD54654654400003458776"
+                }
+            },
+            "Buyer": {
+                "IDNO": "12345678901234",
+                "TVA": "654321",
+                "Title": "Alter Ego I.I.",
+                "Name": "Alter Ego I.I.",
+                "Email": "oleg.dynga@gmail.com",
+                "Phone": "+37369102424",
+                "Address": "Stefan cel Mare 180, Этаж 3",
+                "TaxpayerType": 1,
+                "BankAccount": {
+                    "BranchTitle": "-",
+                    "BranchCode": "-",
+                    "Account": "-"
+                },
+                "Currency": "MDL"
+            },
+            "Transporter": {
+                "IDNO": "-",
+                "Title": "-",
+                "Address": "-",
+                "TaxpayerType": 1,
+                "BankAccount": {
+                    "BranchTitle": "-",
+                    "BranchCode": "-",
+                    "Account": "-"
+                }
+            },
+            "AttachedDocuments": "",
+            "Notes": "",
+            "DelegateSeria": "",
+            "DelegateNumber": "",
+            "DelegateName": "",
+            "DelegateDate": "",
+            "VehicleLogbook": {
+                "IssueDate": "",
+                "Seria": "",
+                "Number": ""
+            },
+            "LoadingPoint": "",
+            "UnloadingPoint": "",
+            "Redirections": "",
+            "Merchandises": {
+                "1": {
+                    "Code": 1,
+                    "SKU": "T144D",
+                    "Name": "Set de 5 panze de ferastrau, Alluse, T144D",
+                    "UnitPrice": "30.00",
+                    "Quantity": 2,
+                    "UnitOfMeasure": "pcs",
+                    "TotalPrice": "60.00",
+                    "UnitPriceWithoutTVA": 0,
+                    "TotalPriceWithoutTVA": 0,
+                    "TVA": 0,
+                    "TotalTVA": 0,
+                    "OtherInfo": "",
+                    "PackageType": "",
+                    "NumberOfPlaces": 0,
+                    "GrossWeight": 0
+                },
+                "2": {
+                    "Code": 2,
+                    "SKU": "TSK26",
+                    "Name": "Fierastrau pentru metal cu maner plastic, TSK26",
+                    "UnitPrice": "22.00",
+                    "Quantity": 1,
+                    "UnitOfMeasure": "pcs",
+                    "TotalPrice": "22.00",
+                    "UnitPriceWithoutTVA": 0,
+                    "TotalPriceWithoutTVA": 0,
+                    "TVA": 0,
+                    "TotalTVA": 0,
+                    "OtherInfo": "",
+                    "PackageType": "",
+                    "NumberOfPlaces": 0,
+                    "GrossWeight": 0
+                }
+            },
+            "CreationMotiv": 1
+        },
+        "AdditionalInformation": {
+            "field": "Remark...",
+            "remark": "Remark...",
+            "total": "82.00",
+            "issue_date": "2022-11-22 17:04:42"
+        }
+    }
+}"
+  ["topic"]=>
+  string(9) "Remark..."
+  ["order_id"]=>
+  NULL
+  ["is_deal"]=>
+  string(1) "0"
+  ["outer_id"]=>
+  string(10) "Delta-4366"
+  ["outer_invoice_id"]=>
+  string(10) "Delta-4366"
+  ["json_extention"]=>
+  string(2) "{}"
+  ["buyer_phone"]=>
+  NULL
+  ["buyer_email"]=>
+  NULL
+  ["buyer_tva"]=>
+  NULL
+  ["doc_url"]=>
+  NULL
+  ["buyer_caption"]=>
+  NULL
+  ["tva_calc"]=>
+  string(0) ""
+  ["tva_rate"]=>
+  NULL
+  ["tva_amount"]=>
+  string(4) "0.00"
+  ["wtva_amount"]=>
+  string(4) "0.00"
+  ["invoice_pattern"]=>
+  NULL
+  ["pattern_language"]=>
+  NULL
+  ["source_create"]=>
+  string(4) "self"
+  ["is_archived"]=>
+  string(1) "0"
+  ["client_id"]=>
+  string(9) "221043438"
+}
+
+
+=== $factura ===
+
+object(stdClass)#196 (2) {
+  ["SupplierInfo"]=>
+  object(stdClass)#157 (16) {
+    ["DeliveryDate"]=>
+    string(19) "2022-11-22 17:04:42"
+    ["Supplier"]=>
+    object(stdClass)#186 (9) {
+      ["IDNO"]=>
+      string(13) "1019600052449"
+      ["TVA"]=>
+      string(7) "0208851"
+      ["Title"]=>
+      string(10) "Delta S.A."
+      ["Name"]=>
+      string(16) "Vladimir Macarov"
+      ["Email"]=>
+      string(18) "delta.sa@gmail.com"
+      ["Phone"]=>
+      string(18) "‎+373 79 760-762"
+      ["Address"]=>
+      string(26) "Chisinau, str. Columna, 84"
+      ["TaxpayerType"]=>
+      int(1)
+      ["BankAccount"]=>
+      object(stdClass)#187 (3) {
+        ["BranchTitle"]=>
+        string(30) "Victoriabank, Chisinau, Centru"
+        ["BranchCode"]=>
+        string(8) "VB654543"
+        ["Account"]=>
+        string(22) "MD54654654400003458776"
+      }
+    }
+    ["Buyer"]=>
+    object(stdClass)#188 (10) {
+      ["IDNO"]=>
+      string(14) "12345678901234"
+      ["TVA"]=>
+      string(6) "654321"
+      ["Title"]=>
+      string(14) "Alter Ego I.I."
+      ["Name"]=>
+      string(14) "Alter Ego I.I."
+      ["Email"]=>
+      string(20) "oleg.dynga@gmail.com"
+      ["Phone"]=>
+      string(12) "+37369102424"
+      ["Address"]=>
+      string(31) "Stefan cel Mare 180, Этаж 3"
+      ["TaxpayerType"]=>
+      int(1)
+      ["BankAccount"]=>
+      object(stdClass)#189 (3) {
+        ["BranchTitle"]=>
+        string(1) "-"
+        ["BranchCode"]=>
+        string(1) "-"
+        ["Account"]=>
+        string(1) "-"
+      }
+      ["Currency"]=>
+      string(3) "MDL"
+    }
+    ["Transporter"]=>
+    object(stdClass)#190 (5) {
+      ["IDNO"]=>
+      string(1) "-"
+      ["Title"]=>
+      string(1) "-"
+      ["Address"]=>
+      string(1) "-"
+      ["TaxpayerType"]=>
+      int(1)
+      ["BankAccount"]=>
+      object(stdClass)#191 (3) {
+        ["BranchTitle"]=>
+        string(1) "-"
+        ["BranchCode"]=>
+        string(1) "-"
+        ["Account"]=>
+        string(1) "-"
+      }
+    }
+    ["AttachedDocuments"]=>
+    string(0) ""
+    ["Notes"]=>
+    string(0) ""
+    ["DelegateSeria"]=>
+    string(0) ""
+    ["DelegateNumber"]=>
+    string(0) ""
+    ["DelegateName"]=>
+    string(0) ""
+    ["DelegateDate"]=>
+    string(0) ""
+    ["VehicleLogbook"]=>
+    object(stdClass)#192 (3) {
+      ["IssueDate"]=>
+      string(0) ""
+      ["Seria"]=>
+      string(0) ""
+      ["Number"]=>
+      string(0) ""
+    }
+    ["LoadingPoint"]=>
+    string(0) ""
+    ["UnloadingPoint"]=>
+    string(0) ""
+    ["Redirections"]=>
+    string(0) ""
+    ["Merchandises"]=>
+    object(stdClass)#194 (2) {
+      ["1"]=>
+      object(stdClass)#193 (15) {
+        ["Code"]=>
+        int(1)
+        ["SKU"]=>
+        string(5) "T144D"
+        ["Name"]=>
+        string(42) "Set de 5 panze de ferastrau, Alluse, T144D"
+        ["UnitPrice"]=>
+        string(5) "30.00"
+        ["Quantity"]=>
+        int(2)
+        ["UnitOfMeasure"]=>
+        string(3) "pcs"
+        ["TotalPrice"]=>
+        string(5) "60.00"
+        ["UnitPriceWithoutTVA"]=>
+        int(0)
+        ["TotalPriceWithoutTVA"]=>
+        int(0)
+        ["TVA"]=>
+        int(0)
+        ["TotalTVA"]=>
+        int(0)
+        ["OtherInfo"]=>
+        string(0) ""
+        ["PackageType"]=>
+        string(0) ""
+        ["NumberOfPlaces"]=>
+        int(0)
+        ["GrossWeight"]=>
+        int(0)
+      }
+      ["2"]=>
+      object(stdClass)#195 (15) {
+        ["Code"]=>
+        int(2)
+        ["SKU"]=>
+        string(5) "TSK26"
+        ["Name"]=>
+        string(47) "Fierastrau pentru metal cu maner plastic, TSK26"
+        ["UnitPrice"]=>
+        string(5) "22.00"
+        ["Quantity"]=>
+        int(1)
+        ["UnitOfMeasure"]=>
+        string(3) "pcs"
+        ["TotalPrice"]=>
+        string(5) "22.00"
+        ["UnitPriceWithoutTVA"]=>
+        int(0)
+        ["TotalPriceWithoutTVA"]=>
+        int(0)
+        ["TVA"]=>
+        int(0)
+        ["TotalTVA"]=>
+        int(0)
+        ["OtherInfo"]=>
+        string(0) ""
+        ["PackageType"]=>
+        string(0) ""
+        ["NumberOfPlaces"]=>
+        int(0)
+        ["GrossWeight"]=>
+        int(0)
+      }
+    }
+    ["CreationMotiv"]=>
+    int(1)
+  }
+  ["AdditionalInformation"]=>
+  object(stdClass)#197 (4) {
+    ["field"]=>
+    string(9) "Remark..."
+    ["remark"]=>
+    string(9) "Remark..."
+    ["total"]=>
+    string(5) "82.00"
+    ["issue_date"]=>
+    string(19) "2022-11-22 17:04:42"
+  }
+}
+
+
+=== $items ===
+
+object(stdClass)#207 (2) {
+  ["1"]=>
+  object(stdClass)#206 (15) {
+    ["Code"]=>
+    int(1)
+    ["SKU"]=>
+    string(5) "T144D"
+    ["Name"]=>
+    string(42) "Set de 5 panze de ferastrau, Alluse, T144D"
+    ["UnitPrice"]=>
+    string(5) "30.00"
+    ["Quantity"]=>
+    int(2)
+    ["UnitOfMeasure"]=>
+    string(3) "pcs"
+    ["TotalPrice"]=>
+    string(5) "60.00"
+    ["UnitPriceWithoutTVA"]=>
+    int(0)
+    ["TotalPriceWithoutTVA"]=>
+    int(0)
+    ["TVA"]=>
+    int(0)
+    ["TotalTVA"]=>
+    int(0)
+    ["OtherInfo"]=>
+    string(0) ""
+    ["PackageType"]=>
+    string(0) ""
+    ["NumberOfPlaces"]=>
+    int(0)
+    ["GrossWeight"]=>
+    int(0)
+  }
+  ["2"]=>
+  object(stdClass)#208 (15) {
+    ["Code"]=>
+    int(2)
+    ["SKU"]=>
+    string(5) "TSK26"
+    ["Name"]=>
+    string(47) "Fierastrau pentru metal cu maner plastic, TSK26"
+    ["UnitPrice"]=>
+    string(5) "22.00"
+    ["Quantity"]=>
+    int(1)
+    ["UnitOfMeasure"]=>
+    string(3) "pcs"
+    ["TotalPrice"]=>
+    string(5) "22.00"
+    ["UnitPriceWithoutTVA"]=>
+    int(0)
+    ["TotalPriceWithoutTVA"]=>
+    int(0)
+    ["TVA"]=>
+    int(0)
+    ["TotalTVA"]=>
+    int(0)
+    ["OtherInfo"]=>
+    string(0) ""
+    ["PackageType"]=>
+    string(0) ""
+    ["NumberOfPlaces"]=>
+    int(0)
+    ["GrossWeight"]=>
+    int(0)
+  }
+}
+
+
+
+*/

@@ -11,7 +11,7 @@ use openecontmd\backend_api\models\Structure;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use openecontmd\backend_api\models\User;
-use openecontmd\backend_api\models\Invoice;
+use openecontmd\backend_api\models\ApiInvoice;
 use openecontmd\backend_api\models\Terms;
 
 /**
@@ -171,8 +171,8 @@ class IncomingController extends BaseController
         $factura = @json_decode($invoice['json_data'])->Document;
         $items = @json_decode($invoice['json_data'])->Document->SupplierInfo->Merchandises;
 
-        //        $status = json_decode(Invoice::getStatusCaption($invoice['status'])->{Yii::$app->language});
-        $status = Invoice::getStatusCaption($invoice['status'])['caption'];
+        //        $status = json_decode(ApiInvoice::getStatusCaption($invoice['status'])->{Yii::$app->language});
+        $status = ApiInvoice::getStatusCaption($invoice['status'])['caption'];
         $status = json_decode($status)->{Yii::$app->language};
         //        echo "<pre>"; var_dump(json_decode($status)->{Yii::$app->language}); echo "</pre>"; exit;
         //var_dump($invoice['json_data'], $items);exit;

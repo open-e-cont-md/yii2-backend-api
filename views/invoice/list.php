@@ -328,17 +328,36 @@ break;
 
 ';
 
-if (count($outs) > 0)
+/*  test  */
 $js_text .= '
-case "P": t = t + "<a class=\"cursor-pointer\" data-id=\"" + raw.inner_hash + "\" data-bs-toggle=\"modal\" data-bs-target=\"#push-modal\"\
+case "P": t = t + "&nbsp; <a class=\"cursor-pointer\" href=\"http://admin-test.repo.tst/payment/v1/merchant/init?order_hash=" + raw.inner_hash + "&order_number=" + raw.outer_number + "\" target=\"_blank\">\
+<i class=\"fa fa-credit-card text-primary\" style=\"font-size:1.2em;cursor:pointer\" title=\"'.Terms::translate('modal_push', 'popup').'\"></i></a>"; break;
+';
+
+
+/* new
+$js_text .= '
+case "P": t = t + "&nbsp; <a class=\"cursor-pointer\" data-id=\"" + raw.inner_hash + "\" data-toggle=\"modal\" data-target=\"#push-modal\"\
+onclick=\"push_key = \'" + raw.inner_hash + "\'; $(\'#push_id\').val(\'" + raw.inner_hash + "\'); $(\'#push_name\').val(\'" + raw.outer_number + "\');\
+$(\'#push_text\').html(\''.(Terms::translate('invoice', 'popup')).': <b>" + raw.outer_number + "</b> '.(Terms::translate('upload', 'invoice')).' <b>" + raw.issue_date + "</b><br><b>" + raw.amount + " " + raw.currency + "</b><br><br><b>'.(Terms::translate('integrations', 'popup')).':</b><br>'.$outs_list.'\');\">\
+<i class=\"fa fa-credit-card text-primary\" style=\"font-size:1.2em;cursor:pointer\" title=\"'.Terms::translate('modal_push', 'popup').'\"></i></a>"; break;
+';
+*/
+
+/*
+if (count($outs) > 0)
+    $js_text .= '
+case "P": t = t + "[<a class=\"cursor-pointer\" data-id=\"" + raw.inner_hash + "\" data-bs-toggle=\"modal\" data-bs-target=\"#push-modal\"\
 onclick=\"push_key = \'" + raw.inner_hash + "\'; $(\'#push_id\').val(\'" + raw.inner_hash + "\'); $(\'#push_name\').val(\'" + raw.outer_number + "\');\
 $(\'#push_text\').html(\''.(Terms::translate('invoice', 'popup')).': <b>" + raw.outer_number + "</b> '.(Terms::translate('upload', 'invoice')).' <b>" + raw.issue_date + "</b><br><b>" + raw.amount + " " + raw.currency + "</b><br><br><b>'.(Terms::translate('integrations', 'popup')).':</b><br>'.$outs_list.'\');\">\
 <i class=\"fa-solid fa-cloud-arrow-down ms-1 me-1 text-success\" style=\"font-size:1.2em\" title=\"'.Terms::translate('modal_push', 'popup').'\"></i></a>"; break;
 ';
-else
-$js_text .= '
-case "P": t = t + "<a class=\"cursor-pointer\"><i class=\"fa-solid fa-cloud-arrow-down ms-1 me-1 text-muted\" style=\"font-size:1.2em\" title=\"'.Terms::translate('modal_push', 'popup').'\"></i></a>"; break;
+    else
+        $js_text .= '
+case "P": t = t + "]<a class=\"cursor-pointer\"><i class=\"fa-solid fa-cloud-arrow-down ms-1 me-1 text-muted\" style=\"font-size:1.2em\" title=\"'.Terms::translate('modal_push', 'popup').'\"></i></a>"; break;
 ';
+*/
+
 
 $js_text .= '
 case "G": t = t + "<a href=\"'.Yii::$app->language.'/order/" + raw.inner_hash + "\" target=\"_blank\" class=\"link-primary\" title=\"Preview order page\"><i class=\"fa-solid fa-magnifying-glass ms-1 me-1 cursor-pointer\" style=\"font-size:1.1em\"></i></a>"; break;
@@ -846,7 +865,7 @@ foreach ($rows as $k => $v) { if ($columns[$v]->FieldVisible) {
 							<span class="ms-1"><?= Terms::translate('close', 'invoice') ?></span><span class="btn-label-right"><i class="mdi mdi-close"></i></span>
 						</button> &nbsp; &nbsp;
     					<button id="send_button" type="button" class="btn btn-primary text-nowrap rounded-pill waves-effect waves-light me-2" onclick="action_send();">
-    					<?= Terms::translate('button_send', 'popup') ?><span class="btn-label-right"><i class="far fa-envelope"></i></span>
+    					<?= Terms::translate('button_send', 'popup') ?><span class="btn-label-right"> &nbsp; <i class="far fa-envelope"></i></span>
     					</button>
                     </div>
                 </form>
@@ -856,9 +875,9 @@ foreach ($rows as $k => $v) { if ($columns[$v]->FieldVisible) {
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<?/**?>
+
 <!-- Push modal content -->
-<div id="push-modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+<div id="push-modal" class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
 
@@ -882,7 +901,7 @@ foreach ($rows as $k => $v) { if ($columns[$v]->FieldVisible) {
                     	<i class="fa-solid fa-arrow-right-to-bracket text-success"></i>
                     </div>
                     <div class="mb-3 text-center">
-              			<button type="button" name="cancel-button" class="btn btn-secondary rounded-pill waves-effect waves-light me-2" data-bs-dismiss="modal" onclick="action_push_clear();">
+              			<button type="button" name="cancel-button" class="btn btn-secondary rounded-pill waves-effect waves-light me-2" data-dismiss="modal" onclick="action_push_clear();">
 							<span class="ms-1"><?= Terms::translate('close', 'invoice') ?></span><span class="btn-label-right"><i class="mdi mdi-close"></i></span>
 						</button>
     					<button id="push_button" type="button" class="btn btn-primary text-nowrap rounded-pill waves-effect waves-light me-2" onclick="action_push();">
@@ -896,6 +915,7 @@ foreach ($rows as $k => $v) { if ($columns[$v]->FieldVisible) {
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<?/**?>
 <!-- Sign modal content -->
 <div id="sign-modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">

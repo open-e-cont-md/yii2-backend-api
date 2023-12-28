@@ -86,50 +86,6 @@ class Bootstrap implements BootstrapInterface
 
 
 
-
-
-
-
-
-        if ($app->id == 'app-frontend') {
-            /*
-             * Регистрация своих маршрутов
-             * (вместо указания в файле config/main.php
-             */
-            $app->getUrlManager()->addRules([
-                "test"            => "invoice/test",
-                "test/<cius:\w+>" => "invoice/test",
-            ], false);
-
-            /*
-             * Регистрация обработчика ответа
-             * (вместо указания в файле config/main.php
-             */
-            $app->set('response', [
-                'class' => 'yii\web\Response',
-                'format' =>  \yii\web\Response::FORMAT_JSON,
-                'on beforeSend' => function ($event) {
-                    $response = $event->sender;
-                    $response_data = $response->data;
-                    if (is_array($response_data)) {
-                        $response->data = [
-                            'status' => $response->isSuccessful ? 'OK' : 'FAIL',
-                        ];
-                        if (Yii::$app->session->get('session_id')) {
-                            $response->data['session_id'] = Yii::$app->session->get('session_id');
-                        }
-                        $response_data['name'] = 'Anonimous';
-                        $response->data['data'] = $response_data;
-                        $response->statusCode = 200;
-                        $response->format = \yii\web\Response::FORMAT_JSON;
-                    } else {
-                        $response->data = $response_data;
-                        $response->format = \yii\web\Response::FORMAT_HTML;
-                    }
-                }
-            ]);
-        }
-
         if ($app->id == 'app-backend') {
 
             $app->controllerNamespace = 'openecontmd\backend_api\controllers';
