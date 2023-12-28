@@ -100,6 +100,7 @@ use yii\helpers\Html;
         </li>
 <?/**/?>
 
+<?/**?>
 <li class="nav-item dropdown">
         <div class="nav navbar-nav navbar-right" style="width:auto;padding: 6px 40px 0 0">
 			<div>
@@ -109,6 +110,7 @@ use yii\helpers\Html;
 			</div>
 		</div>
 </li>
+<?/**/?>
         <!-- Messages Dropdown Menu -->
         <li class="nav-item dropdown">
 <?/**?>
@@ -170,6 +172,8 @@ use yii\helpers\Html;
             </div>
 <?/**/?>
         </li>
+
+<?/**?>
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
@@ -197,6 +201,7 @@ use yii\helpers\Html;
                 <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
             </div>
         </li>
+<?/**/?>
 
         <li class="nav-item">
             <a class="nav-link" data-widget="fullscreen" href="#" role="button">

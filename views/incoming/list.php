@@ -7,6 +7,8 @@ use openecontmd\backend_api\models\SysLang;
 use openecontmd\backend_api\models\Terms;
 use openecontmd\backend_api\models\Content;
 
+Yii::$app->language = 'en';
+
 $this->title = 'Starter Page';
 $this->params['breadcrumbs'] = [['label' => $this->title]];
 
@@ -340,7 +342,7 @@ case "P": t = t + "<a class=\"cursor-pointer\"><i class=\"fa-solid fa-cloud-arro
 ';
 
 $js_text .= '
-case "G": t = t + "<a href=\"'.Yii::$app->language.'/order/" + raw.inner_hash + "\" target=\"_blank\" class=\"link-primary\" title=\"Preview order page\"><i class=\"fa-solid fa-magnifying-glass ms-1 me-1 cursor-pointer\" style=\"font-size:1.1em\"></i></a>"; break;
+case "G": t = t + "<a href=\"order/" + raw.inner_hash + "\" target=\"_blank\" class=\"link-primary\" title=\"Preview order page\"><i class=\"fa-solid fa-magnifying-glass ms-1 me-1 cursor-pointer\" style=\"font-size:1.1em\"></i></a>"; break;
 ';
 
 $js_text .= '

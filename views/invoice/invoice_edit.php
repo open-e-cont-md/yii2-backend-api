@@ -3,6 +3,8 @@ use yii\helpers\Html;
 use openecontmd\backend_api\models\Terms;
 use openecontmd\backend_api\models\ApiInvoice;
 
+Yii::$app->language = 'en';
+
 $this->title = str_replace(['<br>', '<br/>'], ' ', 'Редактирование счёта на оплату'); // Yii::t('apl','sign_in');
 $params['class'] = 'form-control';
 $params['autocomplete'] = 'off';
@@ -592,7 +594,7 @@ function changeDueOn() {
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-					<a href="/<?= Yii::$app->language ?>/outgoing<?//= $context['business'][$sb]['business_token'] ?>">
+					<a href="<?//= Yii::$app->language ?>/outgoing<?//= $context['business'][$sb]['business_token'] ?>">
                 		<button type="button" class="btn btn-primary rounded-pill waves-effect waves-light me-2">
                     		<span class="btn-label"><i class="mdi mdi-chevron-double-left"></i></span><?= Terms::translate('go_to_list', 'button') ?>
                     	</button>
@@ -974,7 +976,7 @@ var ii = <?= $i-1 ?>;
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-					<a href="/<?= Yii::$app->language ?>/outgoing<?//= $context['business'][$sb]['business_token'] ?>">
+					<a href="<?//= Yii::$app->language ?>/outgoing<?//= $context['business'][$sb]['business_token'] ?>">
                 		<button type="button" class="btn btn-primary rounded-pill waves-effect waves-light me-2">
                     		<span class="btn-label"><i class="mdi mdi-chevron-double-left"></i></span><?= Terms::translate('go_to_list', 'button') ?>
                     	</button>

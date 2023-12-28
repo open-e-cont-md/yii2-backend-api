@@ -1,3 +1,4 @@
+<?php Yii::$app->language = 'en'; ?>
 <footer class="main-footer">
     <strong>Copyright &copy; 2023 <a href="https://diginet.md/<?= Yii::$app->language ?>" target="_blank">Diginet Pro SRL</a>.</strong>
     All rights reserved.

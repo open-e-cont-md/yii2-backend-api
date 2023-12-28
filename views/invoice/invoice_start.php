@@ -4,6 +4,8 @@ use openecontmd\backend_api\models\Helper;
 use openecontmd\backend_api\models\ApiInvoice;
 use openecontmd\backend_api\models\Terms;
 
+Yii::$app->language = 'en';
+
 $this->title = str_replace(['<br>', '<br/>'], ' ', 'Добавление счёта на оплату'); // Yii::t('apl','sign_in');
 $params['class'] = 'form-control';
 $params['autocomplete'] = 'off';
@@ -285,7 +287,7 @@ pattern_item['en'] = '<?= Helper::json_decode_safe($b['pattern_item'])->en ?>';
                 <div class="card-body">
                     <div class="form-group">
 
-					<a href="/<?= Yii::$app->language ?>/outgoing<?//= $context['business'][$sb]['business_token'] ?>">
+					<a href="<?//= Yii::$app->language ?>/outgoing<?//= $context['business'][$sb]['business_token'] ?>">
                 		<button type="button" class="btn btn-primary rounded-pill waves-effect waves-light me-2">
                     		<span class="btn-label"><i class="mdi mdi-chevron-double-left"></i></span><?= Terms::translate('go_to_list', 'button') ?>
                     	</button>
@@ -691,7 +693,7 @@ var ii = <?= $i ?>;
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-					<a href="/<?= Yii::$app->language ?>/invoices/outgoing/<?= $context['business'][$sb]['business_token'] ?>">
+					<a href="<?//= Yii::$app->language ?>/invoices/outgoing/<?= $context['business'][$sb]['business_token'] ?>">
                 		<button type="button" class="btn btn-primary rounded-pill waves-effect waves-light me-2">
                     		<span class="btn-label"><i class="mdi mdi-chevron-double-left"></i></span><?= Terms::translate('go_to_list', 'button') ?>
                     	</button>

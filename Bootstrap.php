@@ -27,13 +27,14 @@ class Bootstrap implements BootstrapInterface
          */
 
         $app->getRequest()->setBaseUrl('');
+/*
         $app->set('request', [
 //            'class' => 'klisl\languages\Request',
-            //'csrfParam' => '_csrf-backend',
-            'csrfParam' => '_csrf',
+            'csrfParam' => '_csrf-backend',
+            //'csrfParam' => '_csrf',
             'cookieValidationKey' => '56xL4rFl91AMzQ97zmLXL5z60GzDc3BV'
         ]);
-
+*/
         $app->getUrlManager()->enablePrettyUrl = true;
         $app->getUrlManager()->showScriptName = false;
         $app->language = 'en';

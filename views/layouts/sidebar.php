@@ -1,5 +1,5 @@
 <?
-    $ln = Yii::$app->language;
+//    $ln = Yii::$app->language;
 //    $rt = explode('/', Yii::$app->controller->request->url);
     $rt = Yii::$app->controller->request->url;
 
@@ -44,24 +44,24 @@
             <?php
             echo \hail812\adminlte\widgets\Menu::widget([
                 'items' => [
-                    ['label' => 'DASHBOARD', 'url' => ['/'.$ln.'/dashboard'], 'icon' => 'th', 'active' => ($rt == '/'.$ln.'/dashboard')],
-                    ['label' => 'MESSAGES', 'url' => ['/'.$ln.'/message'], 'icon' => 'envelope', 'badge' => '<span class="right badge badge-danger">3</span>', 'active' => ($rt == '/'.$ln.'/message')],
+                    ['label' => 'DASHBOARD', 'url' => ['/dashboard'], 'icon' => 'th', 'active' => ($rt == '/dashboard')],
+                    ['label' => 'MESSAGES', 'url' => ['/message'], 'icon' => 'envelope', 'badge' => '<span class="right badge badge-danger">3</span>', 'active' => ($rt == '/message')],
 
-                    ['label' => 'ACCOUNT', 'url' => ['/'.$ln.'/customer'], 'icon' => 'user', 'active' => ($rt == '/'.$ln.'/customer')],
-                    ['label' => 'MANAGERS', 'url' => ['/'.$ln.'/manager'], 'icon' => 'users', 'active' => ($rt == '/'.$ln.'/manager')],
+                    ['label' => 'ACCOUNT', 'url' => ['/customer'], 'icon' => 'user', 'active' => ($rt == '/customer')],
+                    ['label' => 'MANAGERS', 'url' => ['/manager'], 'icon' => 'users', 'active' => ($rt == '/manager')],
 
                     ['label' => 'OUTGOING:', 'header' => true],
-                    ['label' => 'CLIENTS', 'url' => ['/'.$ln.'/client'], 'icon' => 'shopping-cart', 'active' => ($rt == '/'.$ln.'/client')],
-                    ['label' => 'INVOICES', 'url' => ['/'.$ln.'/outgoing'], 'icon' => 'file-export', 'active' => ($rt == '/'.$ln.'/outgoing')],
+                    ['label' => 'CLIENTS', 'url' => ['/client'], 'icon' => 'shopping-cart', 'active' => ($rt == '/client')],
+                    ['label' => 'INVOICES', 'url' => ['/outgoing'], 'icon' => 'file-export', 'active' => ($rt == '/outgoing')],
 
                     ['label' => 'INCOMING:', 'header' => true],
-                    ['label' => 'VENDORS', 'url' => ['/'.$ln.'/vendor'], 'icon' => 'shopping-cart', 'active' => ($rt == '/'.$ln.'/vendor')],
-                    ['label' => 'INCOMING', 'url' => ['/'.$ln.'/incoming'], 'icon' => 'file-import', 'badge' => '<span class="right badge badge-success">11</span>', 'active' => ($rt == '/'.$ln.'/incoming')],
+                    ['label' => 'VENDORS', 'url' => ['/vendor'], 'icon' => 'shopping-cart', 'active' => ($rt == '/vendor')],
+                    ['label' => 'INCOMING', 'url' => ['/incoming'], 'icon' => 'file-import', 'badge' => '<span class="right badge badge-success">11</span>', 'active' => ($rt == '/incoming')],
 
                     ['label' => 'SETTINGS:', 'header' => true],
-                    ['label' => 'REPOSITORY', 'url' => ['/'.$ln.'/repository'], 'icon' => 'file-code', 'active' => ($rt == '/'.$ln.'/repository')],
-                    ['label' => 'USER RIGHTS', 'url' => ['/'.$ln.'/rights'], 'icon' => 'key', 'active' => ($rt == '/'.$ln.'/rights')],
-                    ['label' => 'PARAMETERS', 'url' => ['/'.$ln.'/setting'], 'icon' => 'sliders-h', 'active' => ($rt == '/'.$ln.'/setting')],
+                    ['label' => 'REPOSITORY', 'url' => ['/repository'], 'icon' => 'file-code', 'active' => ($rt == '/repository')],
+                    ['label' => 'USER RIGHTS', 'url' => ['/rights'], 'icon' => 'key', 'active' => ($rt == '/rights')],
+                    ['label' => 'PARAMETERS', 'url' => ['/setting'], 'icon' => 'sliders-h', 'active' => ($rt == '/setting')],
 /**
                      ['label' => ' ', 'header' => true],
                      ['label' => '---=== SAMPLE ===---', 'header' => true],

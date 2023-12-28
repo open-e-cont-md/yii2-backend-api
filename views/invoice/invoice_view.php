@@ -2,6 +2,8 @@
 use yii\helpers\Html;
 use openecontmd\backend_api\models\Terms;
 
+Yii::$app->language = 'en';
+
 //$this->title = 'Список инвойсов';
 //$params['class'] = 'form-control';
 //$params['autocomplete'] = 'off';
@@ -44,7 +46,7 @@ $b = (isset($sb) && isset($context['business'][$sb])) ? $context['business'][$sb
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-					<a href="/<?= Yii::$app->language ?>/outgoing">
+					<a href="<?//= Yii::$app->language ?>/outgoing">
                 		<button type="button" class="btn btn-info rounded-pill waves-effect waves-light me-2 mt-1 mb-1">
                     		&nbsp;&nbsp;<span class="btn-label"><i class="fa fa-angle-double-left"></i></span>&nbsp;&nbsp;<?= Terms::translate('go_to_list', 'button') ?>&nbsp;&nbsp;
                     	</button>
@@ -181,7 +183,7 @@ $b = (isset($sb) && isset($context['business'][$sb])) ? $context['business'][$sb
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-					<a href="/<?= Yii::$app->language ?>/outgoing">
+					<a href="<?//= Yii::$app->language ?>/outgoing">
                 		<button type="button" class="btn btn-info rounded-pill waves-effect waves-light me-2 mt-1 mb-1">
                     		&nbsp;&nbsp;<span class="btn-label"><i class="fa fa-angle-double-left"></i></span>&nbsp;&nbsp;<?= Terms::translate('go_to_list', 'button') ?>&nbsp;&nbsp;
                     	</button>

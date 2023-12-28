@@ -10,6 +10,8 @@ use openecontmd\backend_api\widgets\AlertToastr;
 \hail812\adminlte3\assets\AdminLteAsset::register($this);
 //\hail812\adminlte3\assets\PluginAsset::register($this)->add(['fontawesome', 'icheck-bootstrap']);
 
+Yii::$app->language = 'en';
+
 $this->registerCssFile('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback');
 $this->registerCssFile('https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css');
 $assetDir = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');

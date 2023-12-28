@@ -9,6 +9,8 @@ use openecontmd\backend_api\models\Content;
 //$params['class'] = 'form-control';
 //$params['autocomplete'] = 'off';
 
+Yii::$app->language = 'en';
+
 $pi = Yii::$app->request->pathInfo;
 $branch_header = Content::getBranch($this->context->action->controller->module->controller->module->requestedRoute);
 //echo "<pre>"; var_dump($pi, $branch_header); echo "</pre>"; exit;
@@ -81,7 +83,7 @@ $this->registerJs('var buyers={};', 1);
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-           			<a href="/<?= Yii::$app->language ?>/manager">
+           			<a href="<?//= Yii::$app->language ?>/manager">
                 		<button type="button" class="btn btn-info rounded-pill waves-effect waves-light me-3" style="margin-right:10px">
                     		<span class="btn-label"><i class="mdi mdi-chevron-double-left"></i></span><span class="me-1"><?= Terms::translate('go_to_list', 'button') ?></span>
                     	</button>
@@ -396,7 +398,7 @@ $this->registerJs('var buyers={};', 1);
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-           			<a href="/<?= Yii::$app->language ?>/manager">
+           			<a href="<?//= Yii::$app->language ?>/manager">
                 		<button type="button" class="btn btn-info rounded-pill waves-effect waves-light me-3" style="margin-right:10px">
                     		<span class="btn-label"><i class="mdi mdi-chevron-double-left"></i></span><span class="me-1"><?= Terms::translate('go_to_list', 'button') ?></span>
                     	</button>

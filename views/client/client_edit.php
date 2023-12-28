@@ -2,7 +2,7 @@
 //use yii\helpers\Html;
 use openecontmd\backend_api\models\Terms;
 
-//Yii::$app->language = 'en';
+Yii::$app->language = 'en';
 
 $this->title = 'Редактирование покупателя';
 $params['class'] = 'form-control';
@@ -69,7 +69,7 @@ if ( !isset($customer->caption_long) || ($customer->caption_long == '') ) $custo
 	<div class="col-12">
 		<div class="card">
 			<div class="card-body">
-				<a href="/<?= Yii::$app->language ?>/client">
+				<a href="<?//= Yii::$app->language ?>/client">
             		<button type="button" class="btn btn-info rounded-pill waves-effect waves-light me-3" style="margin-right:20px">
                 		<span class="btn-label"><i class="mdi mdi-chevron-double-left"></i></span><span class="me-1"><?= Terms::translate('go_to_list', 'button') ?></span>
                 	</button>
@@ -350,7 +350,7 @@ if ( !isset($customer->caption_long) || ($customer->caption_long == '') ) $custo
 	<div class="col-12">
 		<div class="card">
 			<div class="card-body">
-				<a href="/<?= Yii::$app->language ?>/client">
+				<a href="<?//= Yii::$app->language ?>/client">
             		<button type="button" class="btn btn-info rounded-pill waves-effect waves-light me-3" style="margin-right:20px">
                 		<span class="btn-label"><i class="mdi mdi-chevron-double-left"></i></span><span class="me-1"><?= Terms::translate('go_to_list', 'button') ?></span>
                 	</button>
